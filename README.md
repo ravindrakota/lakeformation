@@ -4,6 +4,9 @@ http://d6ea773e-istiosystem-istio-2af2-1452460012.us-east-1.elb.amazonaws.com/no
 
 vpce-04186865cfd9a24cb-f5de3g4l.server.transfer.us-east-1.vpce.amazonaws.com
 
+FREDDIE_ICN01_SFCRole=2_RqFVXteZsAQ69tFExGtP8xGSsoI=
+
+
 AWSTemplateFormatVersion: '2010-09-09'
 Resources:
   SnowFlakeRole:
