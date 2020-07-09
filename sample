@@ -115,3 +115,45 @@ public class SparkContextManager {
         return sparkSession;
     }
 }
+
+
+import java.io.IOException;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.permission.FsPermission;
+import org.apache.log4j.Logger;
+
+/**
+ * Utils class that validates files from different log paths
+
+ */
+public class OutputUtils {
+	static final Logger logger = Logger.getLogger(OutputUtils.class);
+
+	public static void moveEdgeLogToHdfs(String localLogPath, String hdfsLogPath)
+			throws IOException {
+		Path localLgPath = new Path(localLogPath);
+		Path hdfsLgPath = new Path(hdfsLogPath);
+		FileSystem fs = FileSystem.get(new Configuration());
+		FsPermission fileper = new FsPermission((short) 0755);
+		if (!fs.exists(hdfsLgPath)) {
+			logger.info("Hdfs log directory doesn't exists. Creating "
+					+ hdfsLgPath);
+			fs.mkdirs(hdfsLgPath, fileper);
+		}
+		fs.moveFromLocalFile(localLgPath, hdfsLgPath);
+	}
+
+	public static void validateOutputParent(String outputParent)
+			throws IOException {
+		Path outParentPath = new Path(outputParent);
+		FileSystem fs = FileSystem.get(new Configuration());
+		FsPermission fileper = new FsPermission((short) 0755);
+		if (!fs.exists(outParentPath))
+		{
+			logger.info("DataProfiling directory doesn't exist. Creating "
+					+ outParentPath);
+			fs.mkdirs(outParentPath, fileper);
+		}
+	}
