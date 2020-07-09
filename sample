@@ -157,3 +157,86 @@ public class OutputUtils {
 			fs.mkdirs(outParentPath, fileper);
 		}
 	}
+
+
+
+import org.apache.hadoop.yarn.api.records.ApplicationId;
+import org.apache.hadoop.yarn.logaggregation.*;
+
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.permission.FsPermission;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.RollingFileAppender;
+
+
+public class LogUtils {
+	static final Logger logger = Logger.getLogger(LogUtils.class);
+	public static void createLogger(String filePath)
+	{
+		logger.info("Edge node log file is "+filePath);
+		// creates pattern layout
+		PatternLayout layout = new PatternLayout();
+		String conversionPattern = "%d{dd MMM yyyy HH:mm:ss},%m%n";
+		layout.setConversionPattern(conversionPattern);
+		// creates file appender
+		RollingFileAppender rollfileAppender = new RollingFileAppender();
+		rollfileAppender.setFile(filePath);
+		rollfileAppender.setMaxFileSize("200MB");
+		rollfileAppender.setMaxBackupIndex(1);
+		rollfileAppender.setLayout(layout);
+		rollfileAppender.activateOptions();
+		// creates console appender
+		ConsoleAppender consoleappender = new ConsoleAppender();
+		consoleappender.setLayout(layout);
+		consoleappender.setThreshold(Level.DEBUG);
+		consoleappender.activateOptions();
+		// configures the root logger
+		Logger rootLogger = Logger.getRootLogger();
+		// rootLogger.addAppender(consoleappender);
+		rootLogger.addAppender(rollfileAppender);
+		rootLogger.setLevel(Level.INFO);
+	}
+	
+	public static void LogConfig(long clusterTimestamp, int appId,
+			Configuration conf,String hdfslogPath, String hdfsLogFileName) throws IOException, InterruptedException {
+		Path hdfsLgPath = new Path (hdfslogPath);
+		FileSystem fs = FileSystem.get(conf);
+		FsPermission fileper = new FsPermission((short) 0775);
+		if(!fs.exists(hdfsLgPath))
+		{
+			logger.info("Hdfs log directory doesn't exists. Creating "+hdfsLgPath);
+			fs.mkdirs(hdfsLgPath,fileper);
+		}
+		try {
+			Thread.sleep(10000); // Sleep, Since Yarn takes time to aggregate
+									// logs from all containers.
+		}
+		catch (InterruptedException ex) {
+			Thread.currentThread().interrupt();
+		}
+				ApplicationId app = ApplicationId.newInstance(clusterTimestamp, appId);
+		LogCLIHelpers lg = new LogCLIHelpers();
+		lg.setConf(conf);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		PrintStream ps = new PrintStream(baos);
+		lg.dumpAllContainersLogs(app, System.getenv("USER"), ps);
+		String LogContent = baos.toString();
+		Path FullLogpath = new Path(hdfsLogFileName);
+		BufferedWriter br = new BufferedWriter(new OutputStreamWriter(
+				fs.create(FullLogpath, true)));
+		br.write(LogContent);
+		br.append('\n');
+		br.close();
+	}
+}
