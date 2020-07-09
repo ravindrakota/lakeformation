@@ -91,3 +91,27 @@ public class JsonUtils {
         return null;
     }
 }
+
+
+public class SparkContextManager {
+
+    private static SparkSession sparkSession = null;
+
+    public static void stopSparkContext(){
+        if (sparkSession != null) {
+            sparkSession.stop();
+        }
+    }
+
+    public static synchronized void setSparkSession(SparkSession spark) {
+        sparkSession = spark;
+    }
+
+    public static synchronized SparkSession getSparkSession() {
+        if (sparkSession == null) {
+            sparkSession = SparkSession.builder().getOrCreate();
+            sparkSession.sql("set spark.sql.caseSensitive=false");
+        }
+        return sparkSession;
+    }
+}
