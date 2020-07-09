@@ -295,3 +295,109 @@ public class OutputUtils {
 		}
 	}
 }
+
+
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.impl.conn.SingleClientConnManager;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+
+public class SSLUtils {
+
+    public static ClientConnectionManager bypassSSL() throws Exception{
+        SSLContext sslContext = SSLContext.getInstance("SSL");
+
+        // set up a TrustManager that trusts everything
+        sslContext.init(null, new TrustManager[] { new X509TrustManager() {
+            public X509Certificate[] getAcceptedIssuers() {
+                return null;
+            }
+
+            public void checkClientTrusted(X509Certificate[] certs,
+                                           String authType) {
+            }
+
+            public void checkServerTrusted(X509Certificate[] certs,
+                                           String authType) {
+            }
+        } }, new SecureRandom());
+
+        SSLSocketFactory sf = new SSLSocketFactory(sslContext);
+        Scheme httpsScheme = new Scheme("https", 443, sf);
+        SchemeRegistry schemeRegistry = new SchemeRegistry();
+        schemeRegistry.register(httpsScheme);
+        schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
+
+
+// apache HttpClient version >4.2 should use BasicClientConnectionManager
+        ClientConnectionManager cm = new SingleClientConnManager(schemeRegistry);
+        return cm;
+    }
+}
+
+import com.google.common.base.Throwables;
+
+import java.io.PrintWriter;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+
+public class ConsoleLogger {
+    static final java.util.logging.Logger consoleLog = java.util.logging.Logger.getLogger(ConsoleLogger.class + "");
+    static final PrintWriter stdoutWriter = new PrintWriter(System.out, true);
+    static final StringBuilder outputErrorLogsCollector;
+
+    static {
+        consoleLog.setLevel(Level.ALL);
+        ConsoleHandler handler = new ConsoleHandler();
+        handler.setFormatter(new MyFormatter());
+        handler.setLevel(Level.ALL);
+        consoleLog.addHandler(handler);
+        outputErrorLogsCollector = new StringBuilder();
+    }
+
+    public static void consoleLog(String mesg) {
+        stdoutWriter.println(mesg);
+        outputErrorLogsCollector.append(mesg).append("\n");
+    }
+
+    public static void consoleLog(String mesg, Exception e) {
+        mesg = !mesg.endsWith(": ") ? mesg + ": " : mesg; // formats messages ending with or without ": " properly
+        stdoutWriter.println(mesg + e.getMessage());
+        String stackTrace = Throwables.getStackTraceAsString(e);
+        stdoutWriter.println(stackTrace);
+        outputErrorLogsCollector.append(mesg).append("\n").append(stackTrace).append("\n");
+    }
+
+    public static void consoleLog(Exception e) {
+        String stackTrace = Throwables.getStackTraceAsString(e);
+        stdoutWriter.println(e.getMessage() + "\n" + stackTrace);
+        outputErrorLogsCollector.append(e.getMessage()).append("\n").append(stackTrace).append("\n");
+    }
+
+    public static String getOutputErrorLogs() {
+        return outputErrorLogsCollector.toString();
+    }
+
+    public static void clear() { // used for testing purposes
+        outputErrorLogsCollector.setLength(0);
+    }
+
+    static class MyFormatter extends Formatter {
+        @Override
+        public String format(LogRecord record) {
+
+            return record.getMessage() + "\n";
+        }
+    }
+}
+
