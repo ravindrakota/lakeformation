@@ -21,3 +21,73 @@ CGWSPZ0/4ihFXULChoyQpsMETaWrDOi8jFQZOn/AexQmwQKBgGO96uOZK+BoRiJfLHXtDvmaPXtR
 Ri4nkJd4pDTaKisp9GzSTKDo2BTTMXyILpqtehaYOB/0//3GzM1ZTX8OaNUrj40cBML45Fi6dQL5
 nc+wZmZrPE6qJVjSi8QaeA3h+sL48KZXoBEQl1DgKMma03WwjUnMiln9kPke60HNhawR
 -----END RSA PRIVATE KEY-----
+
+
+import org.apache.log4j.Logger;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import java.io.IOException;
+import java.util.Collection;
+
+/**
+ * JsonUtils used to change JSON strings into deserialized objects.
+ */
+public class JsonUtils {
+    static Logger log = Logger.getLogger(JsonUtils.class);
+
+    public static <T> T convertFromJson(String json, Class<T> valueType) {
+        ObjectMapper om = new ObjectMapper();
+        om.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        om.setVisibilityChecker(om.getSerializationConfig().getDefaultVisibilityChecker()
+            .withFieldVisibility(org.codehaus.jackson.annotate.JsonAutoDetect.Visibility.ANY)
+            .withGetterVisibility(org.codehaus.jackson.annotate.JsonAutoDetect.Visibility.NONE)
+            .withSetterVisibility(org.codehaus.jackson.annotate.JsonAutoDetect.Visibility.NONE)
+            .withCreatorVisibility(org.codehaus.jackson.annotate.JsonAutoDetect.Visibility.NONE));
+
+        T id = null;
+        try {
+            id = om.readValue(json, valueType);
+            return id;
+        } catch (JsonParseException e) {
+            log.error("convertFromJson", e);
+        } catch (JsonMappingException e) {
+            log.error("convertFromJson", e);
+        } catch (IOException e) {
+            log.error("convertFromJson", e);
+        }
+        return null;
+    }
+
+    public static String convertToJson(Object ld) {
+        try {
+            String json;
+            json = new ObjectMapper().writeValueAsString(ld);
+            return json;
+        } catch (IOException e) {
+            log.error("convertToJson", e);
+        }
+        return null;
+    }
+
+    public static <T> T  convertFromJsonArray(String json , Class<? extends Collection> collectionClass, Class<?> elementClass){
+        if(json != null && !json.isEmpty()){
+            ObjectMapper om = new ObjectMapper();
+            try {
+                T id = om.readValue(json,
+                        om.getTypeFactory().constructCollectionType(
+                                collectionClass, elementClass));
+                return id;
+
+            } catch (JsonParseException e) {
+                log.error("convertFromJsonArray",e);
+            } catch (JsonMappingException e) {
+                log.error("convertFromJsonArray",e);
+            } catch (IOException e) {
+                log.error("convertFromJsonArray",e);
+            }
+        }
+        return null;
+    }
+}
