@@ -36,6 +36,8 @@ Resources:
     Type: 'AWS::IAM::Role'
     
     ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDEWATrXQQEok55I0KxNh/+ZNmABjvLVnQaNYXBNTaqJ2WMvMW70A/2TC8s+/MJXT/V2M+BC89Gt2YwTkiHS6aocsbMUs8H4jebl73qkDh/lQoMZwsJ9eNaHbpwiZaSbR8IdzqqhieXEB4mlehc/HQ58Mi/Gjzju22BbOFH76NuZPG7CSmYVkDhRRl0PxHqZ5iF/oowjZhCVltA7ITC+Ch4UCAxQFcoH2uc7C9SXI/dkzy4Zrgjc6eSyeWGHmOAH7BRwfiS7tx3SzN5H/IonWQ975Tndwz+UDYeQ/pUFJRHEXgybfnmv0Tg8QzAnrxd0tavhv6/3p6dN45tTp5M+ZQnYmdnPK8rgMLFS5P1fTl7ZT29PX4xkOzjEGOPcr6W0lfmglBC7B8JD4QCcsb+SNlqpWCTkSTvKjS30ZnQNZxBvbpIJCf7ZBsGqOiwBGorv7LNLefaOF3qesS2yRMkNIAIwbm4err4Wi9MPGiYlHuisqNtWuiRiecUqkKBvFGXGvM= rkota@IP-AC1F6B3F
+    
+    https://cloud.mongodb.com/v2/5f19ea8ff5f1de4a0d04e849#clusters
 
 
 
