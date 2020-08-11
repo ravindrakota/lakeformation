@@ -38,6 +38,58 @@ Resources:
     ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDEWATrXQQEok55I0KxNh/+ZNmABjvLVnQaNYXBNTaqJ2WMvMW70A/2TC8s+/MJXT/V2M+BC89Gt2YwTkiHS6aocsbMUs8H4jebl73qkDh/lQoMZwsJ9eNaHbpwiZaSbR8IdzqqhieXEB4mlehc/HQ58Mi/Gjzju22BbOFH76NuZPG7CSmYVkDhRRl0PxHqZ5iF/oowjZhCVltA7ITC+Ch4UCAxQFcoH2uc7C9SXI/dkzy4Zrgjc6eSyeWGHmOAH7BRwfiS7tx3SzN5H/IonWQ975Tndwz+UDYeQ/pUFJRHEXgybfnmv0Tg8QzAnrxd0tavhv6/3p6dN45tTp5M+ZQnYmdnPK8rgMLFS5P1fTl7ZT29PX4xkOzjEGOPcr6W0lfmglBC7B8JD4QCcsb+SNlqpWCTkSTvKjS30ZnQNZxBvbpIJCf7ZBsGqOiwBGorv7LNLefaOF3qesS2yRMkNIAIwbm4err4Wi9MPGiYlHuisqNtWuiRiecUqkKBvFGXGvM= rkota@IP-AC1F6B3F
     
     https://cloud.mongodb.com/v2/5f19ea8ff5f1de4a0d04e849#clusters
+    
+    {
+  "datasetId": "123456",
+  "ruleSetId": "rsi-100000",
+  "bdqRules": [
+    {
+      "fieldName": "CUSTOMER_NAME",
+      "id": "101",
+      "ruleName": "Notnull",
+      "ruleScope": "COLUMN_LEVEL",
+      "ruleType": "NOT_NULL"
+    },
+    {
+      "id": "102",
+      "fieldName": "TRACKING_NUM",
+      "ruleScope": "COLUMN_LEVEL",
+      "rangeMax": 5000,
+      "rangeMaxDate": "",
+      "rangeMin": 1000,
+      "rangeMinDate": "",
+      "ruleName": "Range",
+      "ruleType": "RANGE"
+    },
+    {
+      "fieldName": "EVENT_CODE",
+      "platform": "Sanity_Test_Rule_Set",
+      "id": "103",
+      "ruleName": "ValidValues",
+      "ruleScope": "COLUMN_LEVEL",
+      "ruleType": "VALID_VALUES",
+      "validValues": "020,010,15"
+    },
+    {
+      "fieldName": "EVENT_TIMESTAMP",
+      "platform": "Sanity_Test_Rule_Set",
+      "regularExpression": "^[0-9]{2}-[0-9]{2}-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{2}$",
+      "id": "104",
+      "ruleName": "Dateformat",
+      "ruleScope": "COLUMN_LEVEL",
+      "ruleType": "REGEX"
+    },
+    {
+      "fieldName": "ZIP_CODE",
+      "platform": "Sanity_Test_Rule_Set",
+      "regularExpression": "^[0-9]{5}$",
+      "id": "105",
+      "ruleName": "zipcode",
+      "ruleScope": "COLUMN_LEVEL",
+      "ruleType": "REGEX"
+    }
+  ]
+}
 
 
 
